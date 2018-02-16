@@ -22,8 +22,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"launchpad.net/gnuflag"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 type rpmInstall struct {
@@ -35,7 +35,7 @@ type rpmInstall struct {
 func (c *rpmInstall) usage() string {
 	return `Installs rpm packages into the container.
 	
-	lmsdk-target rpminstall <container> <package1> [package2 package3 ...] `
+	ocsdk-target rpminstall <container> <package1> [package2 package3 ...] `
 }
 
 func (c *rpmInstall) flags() {
@@ -52,7 +52,7 @@ func (c *rpmInstall) run(args []string) error {
 	c.container = args[0]
 
 	//make sure the container exists
-	container, err := lm_sdk_tools.LoadLMContainer(c.container)
+	container, err := lm_sdk_tools.LoadOCContainer(c.container)
 	if err != nil {
 		return fmt.Errorf("Could not connect to the Container: %v", err)
 	}

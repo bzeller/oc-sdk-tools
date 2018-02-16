@@ -20,29 +20,32 @@ package main
 
 import (
 	"os"
-
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
-type destroyCmd struct {
-	container string
+type upgradeCmd struct {
 }
 
-func (c *destroyCmd) usage() string {
-	return `Deletes a container.
+func (c *upgradeCmd) usage() string {
+	return `Upgrades the container.
 
-lmsdk-target destroy container`
+ocsdk-target upgrade container`
 }
 
-func (c *destroyCmd) flags() {
+func (c *upgradeCmd) flags() {
 }
 
-func (c *destroyCmd) run(args []string) error {
+func (c *upgradeCmd) run(args []string) error {
 	if len(args) < 1 {
 		PrintUsage(c)
 		os.Exit(1)
 	}
-	c.container = args[0]
 
-	return lm_sdk_tools.RemoveContainerSync(c.container)
+	exec := &execCmd{maintMode: true}
+
+	execArgs := []string{
+		args[0],
+		"/bin/bash", "-c", "zypper --non-interactive ref && zypper --non-interactive up -y",
+	}
+
+	return exec.run(execArgs)
 }

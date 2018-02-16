@@ -24,8 +24,8 @@ import (
 
 	lxc "gopkg.in/lxc/go-lxc.v2"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"launchpad.net/gnuflag"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 type snapshotCmd struct {
@@ -40,7 +40,7 @@ type snapshotCmd struct {
 func (c *snapshotCmd) usage() string {
 	return `Creates a snapshot of the container.
  
- lmsdk-target snapshot <container>`
+ ocsdk-target snapshot <container>`
 }
 
 func (c *snapshotCmd) flags() {
@@ -60,7 +60,7 @@ func (c *snapshotCmd) run(args []string) error {
 	c.container = args[0]
 
 	//make sure the container exists
-	container, err := lm_sdk_tools.LoadLMContainer(c.container)
+	container, err := lm_sdk_tools.LoadOCContainer(c.container)
 	if err != nil {
 		return fmt.Errorf("Could not connect to the Container: %v", err)
 	}
@@ -128,10 +128,10 @@ func (c *snapshotCmd) run(args []string) error {
 			return fmt.Errorf("Failed to restore snapshot: %v", err)
 		}
 
-		//after a snapshot was loaded all LM specific files are gone, recreate them
+		//after a snapshot was loaded all OC specific files are gone, recreate them
 		err = FinalizeContainer(container)
 		if err != nil {
-			return fmt.Errorf("Failed to write LM specific config: %v", err)
+			return fmt.Errorf("Failed to write OC specific config: %v", err)
 		}
 
 		//delete all other snapshots if reset

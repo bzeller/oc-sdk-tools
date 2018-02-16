@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2016 Canonical Ltd
  * Copyright (C) 2017 Link Motion Oy
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,36 +18,45 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"link-motion.com/lm-toolchain-sdk-tools"
+	"github.com/bzeller/oc-sdk-tools"
 )
 
-type listCmd struct {
+type usernameCmd struct {
+	container string
 }
 
-func (c *listCmd) usage() string {
-	return (`Lists the existing SDK build targets.
-
-lmsdk-target list`)
+func (c *usernameCmd) usage() string {
+	return `Returns the default user name inside the container.
+ 
+ ocsdk-target username container`
 }
 
-func (c *listCmd) flags() {
+func (c *usernameCmd) flags() {
 }
 
-func (c *listCmd) run(args []string) error {
+func (c *usernameCmd) run(args []string) error {
+	if len(args) < 1 {
+		PrintUsage(c)
+		return fmt.Errorf("Missing arguments.")
+	}
 
-	lmTargets, err := lm_sdk_tools.FindLMTargets()
+	c.container = args[0]
+
+	container, err := lm_sdk_tools.LoadOCContainer(c.container)
+	if err != nil {
+		return fmt.Errorf("ERROR: %s", err.Error())
+	}
+
+	if !container.Container.Defined() {
+		return fmt.Errorf("Container does not exist")
+	}
+
+	_, _, username, err := lm_sdk_tools.DistroToUserIds(container.Distribution)
 	if err != nil {
 		return err
 	}
-
-	data, err := json.MarshalIndent(lmTargets, "  ", "  ")
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("%s\n", data)
+	fmt.Printf("%s\n", username)
 	return nil
 }

@@ -18,7 +18,7 @@
  */
 package main
 
-// #include "lmsdk-wrapper.h"
+// #include "ocsdk-wrapper.h"
 import "C"
 
 import (
@@ -35,9 +35,9 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"github.com/pborman/uuid"
 	"gopkg.in/lxc/go-lxc.v2"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 var container string
@@ -130,7 +130,7 @@ func executeCommand() int {
 		return 1
 	}
 
-	c, err := lm_sdk_tools.LoadLMContainer(container)
+	c, err := lm_sdk_tools.LoadOCContainer(container)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Could not connect to the Container: %v\n", err)
 		return 1

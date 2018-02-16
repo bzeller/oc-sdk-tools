@@ -19,35 +19,30 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
-	"link-motion.com/lm-toolchain-sdk-tools"
+	"github.com/bzeller/oc-sdk-tools"
 )
 
-type rootfsCmd struct {
+type destroyCmd struct {
+	container string
 }
 
-func (c *rootfsCmd) usage() string {
-	return `Shows the path to the root filesystem of a container.
+func (c *destroyCmd) usage() string {
+	return `Deletes a container.
 
-lmsdk-target rootfs container`
+ocsdk-target destroy container`
 }
 
-func (c *rootfsCmd) flags() {
+func (c *destroyCmd) flags() {
 }
 
-func (c *rootfsCmd) run(args []string) error {
+func (c *destroyCmd) run(args []string) error {
 	if len(args) < 1 {
 		PrintUsage(c)
 		os.Exit(1)
 	}
+	c.container = args[0]
 
-	rootfs, err := lm_sdk_tools.ContainerRootfs(args[0])
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf(rootfs + "\n")
-	return nil
+	return lm_sdk_tools.RemoveContainerSync(c.container)
 }

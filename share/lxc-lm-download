@@ -206,7 +206,7 @@ Optional arguments:
 [ --no-validate ]: Disable GPG validation (not recommended)
 [ --flush-cache ]: Flush the local copy (if present)
 [ --force-cache ]: Force the use of the local copy even if expired
-[ --downloader <downloader> ]: Path to the lmsdk-download binary
+[ --downloader <downloader> ]: Path to the ocsdk-download binary
 
 LXC internal arguments (do not pass manually!):
 [ --name <name> ]: The container name

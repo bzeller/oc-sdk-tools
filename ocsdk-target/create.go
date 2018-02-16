@@ -38,10 +38,10 @@ import (
 
 	"time"
 
+	"github.com/bzeller/oc-sdk-tools"
+	"github.com/bzeller/oc-sdk-tools/fixables"
 	"gopkg.in/lxc/go-lxc.v2"
 	"launchpad.net/gnuflag"
-	"link-motion.com/lm-toolchain-sdk-tools"
-	"link-motion.com/lm-toolchain-sdk-tools/fixables"
 )
 
 type createCmd struct {
@@ -56,9 +56,9 @@ type createCmd struct {
 }
 
 func (c *createCmd) usage() string {
-	return `Creates a new Link Motion SDK build target.
+	return `Creates a new Open Container SDK build target.
 
-lmsdk-target create -n NAME -d DISTRO -v VERSION -a ARCH -b TARGETARCH
+ocsdk-target create -n NAME -d DISTRO -v VERSION -a ARCH -b TARGETARCH
 `
 }
 
@@ -88,7 +88,7 @@ func (c *createCmd) run(args []string) error {
 		//return fmt.Errorf("This command needs to run as root")
 	}
 
-	containerDir := path.Join(lm_sdk_tools.LMTargetPath(), c.name)
+	containerDir := path.Join(lm_sdk_tools.OCTargetPath(), c.name)
 	if _, err := os.Stat(containerDir); err == nil {
 		//container dir does exist already
 
@@ -110,7 +110,7 @@ func (c *createCmd) run(args []string) error {
 		return fmt.Errorf("Container with requested name exists already")
 	}
 
-	container, err := lxc.NewContainer(c.name, lm_sdk_tools.LMTargetPath())
+	container, err := lxc.NewContainer(c.name, lm_sdk_tools.OCTargetPath())
 	if err != nil {
 		return fmt.Errorf("ERROR: %s", err.Error())
 	}
@@ -137,9 +137,9 @@ func (c *createCmd) run(args []string) error {
 		return fmt.Errorf("The lxc-lm-download was not found on the system")
 	}
 
-	downloader := path.Join(path.Dir(template), "lmsdk-download")
+	downloader := path.Join(path.Dir(template), "ocsdk-download")
 	if _, err := os.Stat(downloader); os.IsNotExist(err) {
-		return fmt.Errorf("The lmsdk-download tool was not found on the system")
+		return fmt.Errorf("The ocsdk-download tool was not found on the system")
 	}
 
 	// -d link-motion-autoos -a i686 -b i686 -v 0.30  -n autoos-x862
@@ -181,7 +181,7 @@ func (c *createCmd) run(args []string) error {
 	}
 
 	//everything worked out, as last write the config-lm file
-	lmContainer := lm_sdk_tools.LMTargetContainer{
+	lmContainer := lm_sdk_tools.OCTargetContainer{
 		Name:           c.name,
 		Architecture:   c.buildArchitecture,
 		Version:        c.version,
@@ -207,7 +207,7 @@ func (c *createCmd) GenerateDefaultConfigFile(distro string) (string, error) {
 		return "", err
 	}
 
-	confFileName := fmt.Sprintf("%s/lmsdk-%s-default.conf", confDir, distro)
+	confFileName := fmt.Sprintf("%s/ocsdk-%s-default.conf", confDir, distro)
 
 	fmt.Printf("Creating %s\n", confFileName)
 
@@ -361,7 +361,7 @@ func (c *createCmd) registerUserInContainer(container *lxc.Container, containerU
 
 			fmt.Printf("Creating group %s\n", group.Name)
 
-			cmd := exec.Command("lxc-attach", "-P", lm_sdk_tools.LMTargetPath(), "-n", container.Name(),
+			cmd := exec.Command("lxc-attach", "-P", lm_sdk_tools.OCTargetPath(), "-n", container.Name(),
 				"--", "groupadd", "-g", strconv.FormatUint(uint64(group.Gid), 10), group.Name)
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
@@ -388,7 +388,7 @@ func (c *createCmd) registerUserInContainer(container *lxc.Container, containerU
 		fmt.Printf("Creating user %s\n", pw.LoginName)
 
 		command := []string{
-			"-P", lm_sdk_tools.LMTargetPath(), "-n", container.Name(), "--",
+			"-P", lm_sdk_tools.OCTargetPath(), "-n", container.Name(), "--",
 			"useradd", "--no-create-home",
 			"-u", strconv.FormatUint(uint64(pw.Uid), 10),
 			"--gid", strconv.FormatUint(uint64(pw.Gid), 10),
@@ -406,7 +406,7 @@ func (c *createCmd) registerUserInContainer(container *lxc.Container, containerU
 	*/
 
 	command := []string{
-		"-P", lm_sdk_tools.LMTargetPath(), "-n", container.Name(), "--",
+		"-P", lm_sdk_tools.OCTargetPath(), "-n", container.Name(), "--",
 		"sed", "-i",
 		fmt.Sprintf("s;/home/%s;/home/%s;", containerUserName, pw.LoginName),
 		"/etc/passwd",
@@ -419,8 +419,8 @@ func (c *createCmd) registerUserInContainer(container *lxc.Container, containerU
 	return cmd.Run()
 }
 
-// FinalizeContainer runs all lmsdk specific tasks after the container has been created
-func FinalizeContainer(container *lm_sdk_tools.LMTargetContainer) error {
+// FinalizeContainer runs all ocsdk specific tasks after the container has been created
+func FinalizeContainer(container *lm_sdk_tools.OCTargetContainer) error {
 	tools := fixables.NewToolsFixable()
 	if err := tools.FixContainer(container.Container.Name()); err != nil {
 		return fmt.Errorf("Unable to fix container %v", err.Error())

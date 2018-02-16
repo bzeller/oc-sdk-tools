@@ -23,8 +23,8 @@ import (
 
 	"path"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"gopkg.in/lxc/go-lxc.v2"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 type ToolsFixable struct {
@@ -62,7 +62,7 @@ func (this *ToolsFixable) run(container *lxc.Container, doFix bool) error {
 		return fmt.Errorf("Could not resolve the absolute pathname of the tool")
 	}
 
-	wrapperTool := path.Dir(wrapperPath) + "/lmsdk-wrapper"
+	wrapperTool := path.Dir(wrapperPath) + "/ocsdk-wrapper"
 
 	for _, tool := range this.requiredTools {
 		toolPath := containerDir + "/" + tool
@@ -82,7 +82,7 @@ func (this *ToolsFixable) run(container *lxc.Container, doFix bool) error {
 }
 
 func (c *ToolsFixable) CheckContainer(container string) error {
-	cont, err := lxc.NewContainer(container, lm_sdk_tools.LMTargetPath())
+	cont, err := lxc.NewContainer(container, lm_sdk_tools.OCTargetPath())
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func (c *ToolsFixable) CheckContainer(container string) error {
 }
 
 func (c *ToolsFixable) FixContainer(container string) error {
-	cont, err := lxc.NewContainer(container, lm_sdk_tools.LMTargetPath())
+	cont, err := lxc.NewContainer(container, lm_sdk_tools.OCTargetPath())
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (c *ToolsFixable) FixContainer(container string) error {
 func (c *ToolsFixable) Check() error {
 	fmt.Printf("Checking for missing tools...\n")
 
-	targets, err := lm_sdk_tools.FindLMTargets()
+	targets, err := lm_sdk_tools.FindOCTargets()
 	if err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (c *ToolsFixable) Check() error {
 func (c *ToolsFixable) Fix() error {
 	fmt.Printf("Fixing missing tools...\n")
 
-	targets, err := lm_sdk_tools.FindLMTargets()
+	targets, err := lm_sdk_tools.FindOCTargets()
 	if err != nil {
 		return err
 	}

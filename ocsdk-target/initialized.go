@@ -23,8 +23,8 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"launchpad.net/gnuflag"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 const (
@@ -43,7 +43,7 @@ type initializedCmd struct {
 func (c *initializedCmd) usage() string {
 	return `Checks if the container backend is setup correctly.
 
-lmsdk-target initialized`
+ocsdk-target initialized`
 }
 
 func (c *initializedCmd) flags() {

@@ -37,7 +37,7 @@ type helpCmd struct {
 }
 
 func (c *helpCmd) usage() string {
-	return "Presents details on how to use lmsdk-target."
+	return "Presents details on how to use ocsdk-target."
 }
 
 func (c *helpCmd) flags() {
@@ -56,7 +56,7 @@ func (c *helpCmd) run(args []string) error {
 		return nil
 	}
 
-	fmt.Println("Usage: lmsdk-target [subcommand] [options]")
+	fmt.Println("Usage: ocsdk-target [subcommand] [options]")
 	fmt.Println("Available commands:")
 	var names []string
 	for name := range commands {

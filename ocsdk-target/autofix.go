@@ -18,7 +18,7 @@
  */
 package main
 
-import "link-motion.com/lm-toolchain-sdk-tools/fixables"
+import "github.com/bzeller/oc-sdk-tools/fixables"
 
 var fixable_set = []fixables.Fixable{
 	&fixables.DevicesFixable{},

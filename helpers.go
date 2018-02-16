@@ -42,7 +42,7 @@ import (
 	"gopkg.in/lxc/go-lxc.v2"
 )
 
-type LMTargetContainer struct {
+type OCTargetContainer struct {
 	Name           string         `json:"name"`
 	Architecture   string         `json:"architecture"`
 	Distribution   string         `json:"distribution"`
@@ -53,16 +53,16 @@ type LMTargetContainer struct {
 
 const LxcBridgeFile = "/etc/default/lxc-net"
 const LxcUsernetFile = "/etc/lxc/lxc-usernet"
-const LmImageServerEnvVar = "LM_IMAGE_SERVER"
+const LmImageServerEnvVar = "OC_IMAGE_SERVER"
 
-func LMTargetPath() string {
+func OCTargetPath() string {
 	user, err := LxcContainerUser()
 	if err != nil {
 		fmt.Printf("Fatal: Could not query the current user.")
 		os.Exit(1)
 	}
 
-	return "/var/lib/lm-sdk/" + user.Username + "/containers"
+	return "/var/lib/oc-sdk/" + user.Username + "/containers"
 }
 
 func EnsureLXCInitializedOrDie() error {
@@ -135,7 +135,7 @@ func GetOrCreateIdRange(user string, fileName string, doCreate bool) (uint32, ui
 	}
 
 	if os.Getuid() != 0 || !doCreate {
-		return 0, 0, fmt.Errorf("No sub id was found, please run lmsdk-target initialize.")
+		return 0, 0, fmt.Errorf("No sub id was found, please run ocsdk-target initialize.")
 	}
 
 	fmt.Printf("Create ID range: %d 65536\n", nextSubIdStart)
@@ -144,7 +144,7 @@ func GetOrCreateIdRange(user string, fileName string, doCreate bool) (uint32, ui
 
 }
 
-func BootContainerSync(container *LMTargetContainer) error {
+func BootContainerSync(container *OCTargetContainer) error {
 	switch container.Container.State() {
 	case lxc.STARTING:
 		container.Container.Wait(lxc.RUNNING, time.Second*5)
@@ -177,7 +177,7 @@ func UpdateConfigSync(container string) error {
 }
 
 func RemoveContainerSync(container string) error {
-	c, err := lxc.NewContainer(container, LMTargetPath())
+	c, err := lxc.NewContainer(container, OCTargetPath())
 	if err != nil {
 		return fmt.Errorf("ERROR: %s", err.Error())
 	}
@@ -216,7 +216,7 @@ func GetUserConfirmation(question string) bool {
 }
 
 func ContainerRootfs(container string) (string, error) {
-	c, err := lxc.NewContainer(container, LMTargetPath())
+	c, err := lxc.NewContainer(container, OCTargetPath())
 	if err != nil {
 		return "", fmt.Errorf("ERROR: %s", err.Error())
 	}
@@ -228,7 +228,7 @@ func ContainerRootfs(container string) (string, error) {
 	return c.ConfigItem("lxc.rootfs")[0], nil
 }
 
-func toLmContainer(c *lxc.Container) (*LMTargetContainer, error) {
+func toLmContainer(c *lxc.Container) (*OCTargetContainer, error) {
 	if !c.Defined() {
 		return nil, fmt.Errorf("Container %s does not exist", c.Name())
 	}
@@ -239,7 +239,7 @@ func toLmContainer(c *lxc.Container) (*LMTargetContainer, error) {
 		return nil, fmt.Errorf("Unable to read container config file: %s", err)
 	}
 
-	lmContainer := LMTargetContainer{
+	lmContainer := OCTargetContainer{
 		Container: nil,
 	}
 
@@ -253,18 +253,18 @@ func toLmContainer(c *lxc.Container) (*LMTargetContainer, error) {
 	return &lmContainer, nil
 }
 
-func LoadLMContainer(container string) (*LMTargetContainer, error) {
-	c, err := lxc.NewContainer(container, LMTargetPath())
+func LoadOCContainer(container string) (*OCTargetContainer, error) {
+	c, err := lxc.NewContainer(container, OCTargetPath())
 	if err != nil {
 		return nil, fmt.Errorf("ERROR: %s", err.Error())
 	}
 	return toLmContainer(c)
 }
 
-func FindLMTargets() ([]LMTargetContainer, error) {
+func FindOCTargets() ([]OCTargetContainer, error) {
 
-	all_containers := lxc.Containers(LMTargetPath())
-	lmTargets := []LMTargetContainer{}
+	all_containers := lxc.Containers(OCTargetPath())
+	lmTargets := []OCTargetContainer{}
 
 	for _, container := range all_containers {
 
@@ -459,7 +459,7 @@ func EditLxcUsernet() error {
 }
 
 func EnsureRequiredDirectoriesExist(doFix bool) error {
-	targetPath := LMTargetPath()
+	targetPath := OCTargetPath()
 	userPath := filepath.Dir(targetPath)
 	rootPath := filepath.Dir(userPath)
 
@@ -544,7 +544,7 @@ func DistroToUserIds(distro string) (uint32, uint32, string, error) {
 	*/
 }
 
-func RunInContainer(c *LMTargetContainer, runAsRoot bool, env []string, program string, stdoutFd uintptr, stderrFd uintptr) (int, error) {
+func RunInContainer(c *OCTargetContainer, runAsRoot bool, env []string, program string, stdoutFd uintptr, stderrFd uintptr) (int, error) {
 	cid, cgid, _, err := DistroToUserIds(c.Distribution)
 
 	if err != nil {
@@ -603,7 +603,7 @@ func RunInContainer(c *LMTargetContainer, runAsRoot bool, env []string, program 
 
 }
 
-func RunInContainerOuput(c *LMTargetContainer, runAsRoot bool, env []string, program string) ([]string, int, error) {
+func RunInContainerOuput(c *OCTargetContainer, runAsRoot bool, env []string, program string) ([]string, int, error) {
 
 	stdout_r, stdout_w, err := os.Pipe()
 	if err != nil {
@@ -650,7 +650,7 @@ Requires 'createrepo' command to be available.
 
 Returns directory of the created repository and error code.
 */
-func AddZypperRepository(sourceDir string, name string, priority int, runUpdate bool, container *LMTargetContainer) (error, string) {
+func AddZypperRepository(sourceDir string, name string, priority int, runUpdate bool, container *OCTargetContainer) (error, string) {
 	repoDir, err := ioutil.TempDir("", "lm-sdk-repo"+name)
 	out, err := exec.Command("bash", "-c", "cp "+filepath.Join(sourceDir, "*")+" "+repoDir).CombinedOutput()
 	if err != nil {
@@ -680,7 +680,7 @@ RemoveZypperRepository Remove a zypper repository.
 name = Name of the repository (don't use spaces!)
 container = Container to remove the repository from
 */
-func RemoveZypperRepository(name string, container *LMTargetContainer) error {
+func RemoveZypperRepository(name string, container *OCTargetContainer) error {
 	_, err := RunInContainer(container, true, []string{}, "zypper --non-interactive rr "+name, os.Stdout.Fd(), os.Stderr.Fd())
 	if err != nil {
 		return fmt.Errorf("Failed to execute zypper rr command in the container: %v", err)

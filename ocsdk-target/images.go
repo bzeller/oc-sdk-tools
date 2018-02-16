@@ -27,7 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"link-motion.com/lm-toolchain-sdk-tools"
+	"github.com/bzeller/oc-sdk-tools"
 )
 
 type imageDesc struct {
@@ -44,7 +44,7 @@ type imagesCmd struct {
 func (c *imagesCmd) usage() string {
 	return `Shows the available Link-Motion SDK images.
 
-lmsdk-target images`
+ocsdk-target images`
 }
 
 func (c *imagesCmd) flags() {
@@ -62,10 +62,10 @@ func findRelevantImages() ([]imageDesc, error) {
 
 	req, err := http.NewRequest("GET", url, nil)
 
-	if len(os.Getenv("LM_USERNAME")) > 0 {
+	if len(os.Getenv("OC_USERNAME")) > 0 {
 		req.SetBasicAuth(
-			os.Getenv("LM_USERNAME"),
-			os.Getenv("LM_PASSWORD"),
+			os.Getenv("OC_USERNAME"),
+			os.Getenv("OC_PASSWORD"),
 		)
 	}
 

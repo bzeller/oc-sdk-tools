@@ -24,8 +24,8 @@ import (
 	"os/exec"
 	"syscall"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"launchpad.net/gnuflag"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 type execCmd struct {
@@ -42,7 +42,7 @@ func (c *execCmd) usage() string {
 
 	return fmt.Sprintf(`Executes a command in the container.
 
-lmsdk-target %s <container> [command]`, myMode)
+ocsdk-target %s <container> [command]`, myMode)
 }
 
 func (c *execCmd) flags() {
@@ -59,7 +59,7 @@ func (c *execCmd) run(args []string) error {
 	args = args[1:]
 
 	if len(c.user) == 0 {
-		lmCont, err := lm_sdk_tools.LoadLMContainer(c.container)
+		lmCont, err := lm_sdk_tools.LoadOCContainer(c.container)
 		if err != nil {
 			return err
 		}
@@ -77,7 +77,7 @@ func (c *execCmd) run(args []string) error {
 	}
 
 	lxc_args := []string{
-		lxc_command, "-P", lm_sdk_tools.LMTargetPath(),
+		lxc_command, "-P", lm_sdk_tools.OCTargetPath(),
 		"-n", c.container, "--",
 		"su",
 	}

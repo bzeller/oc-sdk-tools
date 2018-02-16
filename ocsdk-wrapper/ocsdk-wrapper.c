@@ -16,7 +16,7 @@
  *
  * Author: Benjamin Zeller <benjamin.zeller@link-motion.com>
  */
-#include "lmsdk-wrapper.h"
+#include "ocsdk-wrapper.h"
 
 #include <sys/types.h>
 #include <sys/wait.h>

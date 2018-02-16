@@ -32,8 +32,8 @@ import (
 
 	"launchpad.net/gnuflag"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"gopkg.in/lxc/go-lxc.v2"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 type autosetupCmd struct {
@@ -44,7 +44,7 @@ type autosetupCmd struct {
 func (c *autosetupCmd) usage() string {
 	return `Creates a default config for the container backend.
 
-lmsdk-target autosetup [-y] [-b]`
+ocsdk-target autosetup [-y] [-b]`
 }
 
 func (c *autosetupCmd) flags() {
@@ -67,7 +67,7 @@ func (c *autosetupCmd) run(args []string) error {
 		return err
 	}
 
-	containers := lxc.Containers(lm_sdk_tools.LMTargetPath())
+	containers := lxc.Containers(lm_sdk_tools.OCTargetPath())
 
 	stoppedContainers := []*lxc.Container{}
 	//first let stop the containers
@@ -146,7 +146,7 @@ func (c *autosetupCmd) run(args []string) error {
 			fmt.Printf("Starting %s .....", container.Name())
 
 			cmd := exec.Command("sudo", "-u", lxcUser.Username, "--",
-				"lxc-start", "-P", lm_sdk_tools.LMTargetPath(), "-n", container.Name())
+				"lxc-start", "-P", lm_sdk_tools.OCTargetPath(), "-n", container.Name())
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			err = cmd.Run()
@@ -177,7 +177,7 @@ func (c *autosetupCmd) detectSubnet() (string, error) {
 
 		columns := strings.Split(trimmed, " ")
 
-		if len(columns) < 2 {
+		if len(columns) < 1 {
 			return "", fmt.Errorf("invalid ip addr output line %s", line)
 		}
 
@@ -228,7 +228,7 @@ func (c *autosetupCmd) detectSubnet() (string, error) {
 func (c *autosetupCmd) editLXCBridgeFile(subnet string) error {
 	buffer := bytes.Buffer{}
 
-	f, err := os.OpenFile(lm_sdk_tools.LxcBridgeFile, os.O_RDWR, 0644)
+	f, err := os.OpenFile(lm_sdk_tools.LxcBridgeFile, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		return err
 	}

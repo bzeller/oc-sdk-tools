@@ -23,8 +23,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"gopkg.in/lxc/go-lxc.v2"
-	"link-motion.com/lm-toolchain-sdk-tools"
 
 	"encoding/json"
 )
@@ -36,7 +36,7 @@ type statusCmd struct {
 func (c *statusCmd) usage() string {
 	return `Shows the current status of the container.
 
-lmsdk-target status container`
+ocsdk-target status container`
 }
 
 func (c *statusCmd) flags() {
@@ -50,7 +50,7 @@ func (c *statusCmd) run(args []string) error {
 
 	c.container = args[0]
 
-	container, err := lxc.NewContainer(c.container, lm_sdk_tools.LMTargetPath())
+	container, err := lxc.NewContainer(c.container, lm_sdk_tools.OCTargetPath())
 	if err != nil {
 		return fmt.Errorf("ERROR: %s", err.Error())
 	}

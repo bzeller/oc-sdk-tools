@@ -33,8 +33,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"launchpad.net/gnuflag"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 var errArgs = fmt.Errorf("wrong number of subcommand arguments")

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 Canonical Ltd
  * Copyright (C) 2017 Link Motion Oy
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,43 +21,39 @@ package main
 import (
 	"fmt"
 
-	"link-motion.com/lm-toolchain-sdk-tools"
+	"os"
+
+	"github.com/bzeller/oc-sdk-tools"
+	"gopkg.in/lxc/go-lxc.v2"
 )
 
-type usernameCmd struct {
-	container string
+type existsCmd struct {
 }
 
-func (c *usernameCmd) usage() string {
-	return `Returns the default user name inside the container.
- 
- lmsdk-target username container`
+func (c *existsCmd) usage() string {
+	return `Checks if a container exists.
+
+ocsdk-target exists container`
 }
 
-func (c *usernameCmd) flags() {
+func (c *existsCmd) flags() {
 }
 
-func (c *usernameCmd) run(args []string) error {
+func (c *existsCmd) run(args []string) error {
 	if len(args) < 1 {
 		PrintUsage(c)
-		return fmt.Errorf("Missing arguments.")
+		os.Exit(1)
 	}
 
-	c.container = args[0]
-
-	container, err := lm_sdk_tools.LoadLMContainer(c.container)
+	container, err := lxc.NewContainer(args[0], lm_sdk_tools.OCTargetPath())
 	if err != nil {
 		return fmt.Errorf("ERROR: %s", err.Error())
 	}
 
-	if !container.Container.Defined() {
-		return fmt.Errorf("Container does not exist")
+	if !container.Defined() {
+		return fmt.Errorf("Container not found")
 	}
 
-	_, _, username, err := lm_sdk_tools.DistroToUserIds(container.Distribution)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%s\n", username)
+	println("Container exists")
 	return nil
 }

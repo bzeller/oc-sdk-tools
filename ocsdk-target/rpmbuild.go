@@ -31,8 +31,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"launchpad.net/gnuflag"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 type rpmbuildCmd struct {
@@ -51,7 +51,7 @@ type rpmbuildCmd struct {
 func (c *rpmbuildCmd) usage() string {
 	return (`Build a rpm in a container build target.
 
-lmsdk-target rpmbuild container <sourcedir> [-t tarballname] [-j threads] [-s specfile] [-o output directory] [--build-deps] [--install]`)
+ocsdk-target rpmbuild container <sourcedir> [-t tarballname] [-j threads] [-s specfile] [-o output directory] [--build-deps] [--install]`)
 }
 
 func (c *rpmbuildCmd) flags() {
@@ -68,7 +68,7 @@ func (c *rpmbuildCmd) flags() {
 /**
  * Queries information from the specfile, pass query in rpm QUERYFORMAT
  */
-func (c *rpmbuildCmd) rpmQuery(query string, specfile string, container *lm_sdk_tools.LMTargetContainer) (string, error) {
+func (c *rpmbuildCmd) rpmQuery(query string, specfile string, container *lm_sdk_tools.OCTargetContainer) (string, error) {
 	//query information from the specfile
 	envVars := []string{
 		"LC_ALL=C",
@@ -97,7 +97,7 @@ func (c *rpmbuildCmd) rpmQuery(query string, specfile string, container *lm_sdk_
  *
  * @TODO: first try to run rpmspec to query SOURCES, if its only one value we can use that
  */
-func (c *rpmbuildCmd) guessTarballName(specfile string, container *lm_sdk_tools.LMTargetContainer) (string, error) {
+func (c *rpmbuildCmd) guessTarballName(specfile string, container *lm_sdk_tools.OCTargetContainer) (string, error) {
 
 	file, err := os.Open(specfile)
 	if err != nil {
@@ -186,7 +186,7 @@ type solvable struct {
 	Kind    string `xml:"kind,attr"`
 }
 
-func (c *rpmbuildCmd) installBuildDependencies(specfile string, container *lm_sdk_tools.LMTargetContainer) error {
+func (c *rpmbuildCmd) installBuildDependencies(specfile string, container *lm_sdk_tools.OCTargetContainer) error {
 	//query information from the specfile
 	envVars := []string{
 		"LC_ALL=C",
@@ -305,15 +305,15 @@ func (c *rpmbuildCmd) run(args []string) error {
 	c.projectDir = args[1]
 
 	//make sure the container is up and running
-	container, err := lm_sdk_tools.LoadLMContainer(c.container)
+	container, err := lm_sdk_tools.LoadOCContainer(c.container)
 	if err != nil {
 		return fmt.Errorf("Could not connect to the Container: %v\n", err)
 	}
 
-	//get executable name of lmsdk-target, for future use
+	//get executable name of ocsdk-target, for future use
 	me, err := os.Executable()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to read path of lmsdk-target binary: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to read path of ocsdk-target binary: %v\n", err)
 		return err
 	}
 
@@ -409,7 +409,7 @@ func (c *rpmbuildCmd) run(args []string) error {
 	fmt.Printf("Building using the specfile: %s\n", c.specfile)
 
 	//create a clean build environment
-	builddir, err := ioutil.TempDir("", "lmsdk-target")
+	builddir, err := ioutil.TempDir("", "ocsdk-target")
 	if err != nil {
 		return err
 	}
@@ -475,7 +475,7 @@ func (c *rpmbuildCmd) run(args []string) error {
 	}
 
 	//now create the source tarball
-	tarballdir, err := ioutil.TempDir("", "lmsdk-target")
+	tarballdir, err := ioutil.TempDir("", "ocsdk-target")
 	if err != nil {
 		return err
 	}

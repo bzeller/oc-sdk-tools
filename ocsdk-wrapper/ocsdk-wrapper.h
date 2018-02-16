@@ -16,8 +16,8 @@
  *
  * Author: Benjamin Zeller <benjamin.zeller@link-motion.com>
  */
-#ifndef LMSDK_WRAPPER_H_INCLUDED
-#define LMSDK_WRAPPER_H_INCLUDED
+#ifndef OCSDK_WRAPPER_H_INCLUDED
+#define OCSDK_WRAPPER_H_INCLUDED
 
 //returns true if the child terminated normally, that is, by calling exit(3) or _exit(2), or by returning from main().
 int get_WIFEXITED(int status);

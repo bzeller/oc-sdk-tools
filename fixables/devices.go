@@ -27,8 +27,8 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/bzeller/oc-sdk-tools"
 	"gopkg.in/lxc/go-lxc.v2"
-	"link-motion.com/lm-toolchain-sdk-tools"
 )
 
 type DevicesFixable struct{}
@@ -97,7 +97,7 @@ func (c *DevicesFixable) run(container *lxc.Container, doFix bool) error {
 }
 
 func (c *DevicesFixable) CheckContainer(container string) error {
-	cont, err := lxc.NewContainer(container, lm_sdk_tools.LMTargetPath())
+	cont, err := lxc.NewContainer(container, lm_sdk_tools.OCTargetPath())
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (c *DevicesFixable) CheckContainer(container string) error {
 }
 
 func (c *DevicesFixable) FixContainer(container string) error {
-	cont, err := lxc.NewContainer(container, lm_sdk_tools.LMTargetPath())
+	cont, err := lxc.NewContainer(container, lm_sdk_tools.OCTargetPath())
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (c *DevicesFixable) FixContainer(container string) error {
 func (c *DevicesFixable) Check() error {
 	fmt.Printf("Checking for broken devices...\n")
 
-	targets, err := lm_sdk_tools.FindLMTargets()
+	targets, err := lm_sdk_tools.FindOCTargets()
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (c *DevicesFixable) Check() error {
 }
 func (c *DevicesFixable) Fix() error {
 	fmt.Println("Checking for and removing broken devices....")
-	targets, err := lm_sdk_tools.FindLMTargets()
+	targets, err := lm_sdk_tools.FindOCTargets()
 	if err != nil {
 		return err
 	}

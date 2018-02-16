@@ -32,20 +32,20 @@ import (
 func usage() {
 	fmt.Println("----")
 	fmt.Println(" OR USE ONE OR MORE:")
-	fmt.Println("    export LM_USERNAME=user")
-	fmt.Println("    export LM_PASSWORD=pass")
-	fmt.Println("    export LM_FILENAME=sometarget.txt")
-	fmt.Println("    export LM_SKIP_LICENCE=1")
-	fmt.Println("    export LM_URL=https://127.0.0.1")
+	fmt.Println("    export OC_USERNAME=user")
+	fmt.Println("    export OC_PASSWORD=pass")
+	fmt.Println("    export OC_FILENAME=sometarget.txt")
+	fmt.Println("    export OC_SKIP_LICENCE=1")
+	fmt.Println("    export OC_URL=https://127.0.0.1")
 }
 
 func main() {
 
-	username := flag.String("username", os.Getenv("LM_USERNAME"), "username")
-	password := flag.String("password", os.Getenv("LM_PASSWORD"), "password")
-	filename := flag.String("filename", os.Getenv("LM_FILENAME"), "filename")
-	checkCerts := flag.Bool("no-cert-check", os.Getenv("LM_SKIP_LICENCE") == "1", "Disable certificate checks when connecting to https")
-	url := flag.String("url", os.Getenv("LM_URL"), "url")
+	username := flag.String("username", os.Getenv("OC_USERNAME"), "username")
+	password := flag.String("password", os.Getenv("OC_PASSWORD"), "password")
+	filename := flag.String("filename", os.Getenv("OC_FILENAME"), "filename")
+	checkCerts := flag.Bool("no-cert-check", os.Getenv("OC_SKIP_LICENCE") == "1", "Disable certificate checks when connecting to https")
+	url := flag.String("url", os.Getenv("OC_URL"), "url")
 
 	flag.Parse()
 

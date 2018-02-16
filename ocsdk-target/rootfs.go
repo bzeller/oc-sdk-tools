@@ -20,40 +20,34 @@ package main
 
 import (
 	"fmt"
-
 	"os"
 
-	"gopkg.in/lxc/go-lxc.v2"
-	"link-motion.com/lm-toolchain-sdk-tools"
+	"github.com/bzeller/oc-sdk-tools"
 )
 
-type existsCmd struct {
+type rootfsCmd struct {
 }
 
-func (c *existsCmd) usage() string {
-	return `Checks if a container exists.
+func (c *rootfsCmd) usage() string {
+	return `Shows the path to the root filesystem of a container.
 
-lmsdk-target exists container`
+ocsdk-target rootfs container`
 }
 
-func (c *existsCmd) flags() {
+func (c *rootfsCmd) flags() {
 }
 
-func (c *existsCmd) run(args []string) error {
+func (c *rootfsCmd) run(args []string) error {
 	if len(args) < 1 {
 		PrintUsage(c)
 		os.Exit(1)
 	}
 
-	container, err := lxc.NewContainer(args[0], lm_sdk_tools.LMTargetPath())
+	rootfs, err := lm_sdk_tools.ContainerRootfs(args[0])
 	if err != nil {
-		return fmt.Errorf("ERROR: %s", err.Error())
+		return err
 	}
 
-	if !container.Defined() {
-		return fmt.Errorf("Container not found")
-	}
-
-	println("Container exists")
+	fmt.Printf(rootfs + "\n")
 	return nil
 }

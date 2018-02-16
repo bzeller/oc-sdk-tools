@@ -19,33 +19,36 @@
 package main
 
 import (
-	"os"
+	"encoding/json"
+	"fmt"
+
+	"github.com/bzeller/oc-sdk-tools"
 )
 
-type upgradeCmd struct {
+type listCmd struct {
 }
 
-func (c *upgradeCmd) usage() string {
-	return `Upgrades the container.
+func (c *listCmd) usage() string {
+	return (`Lists the existing SDK build targets.
 
-lmsdk-target upgrade container`
+ocsdk-target list`)
 }
 
-func (c *upgradeCmd) flags() {
+func (c *listCmd) flags() {
 }
 
-func (c *upgradeCmd) run(args []string) error {
-	if len(args) < 1 {
-		PrintUsage(c)
-		os.Exit(1)
+func (c *listCmd) run(args []string) error {
+
+	lmTargets, err := lm_sdk_tools.FindOCTargets()
+	if err != nil {
+		return err
 	}
 
-	exec := &execCmd{maintMode: true}
-
-	execArgs := []string{
-		args[0],
-		"/bin/bash", "-c", "zypper --non-interactive ref && zypper --non-interactive up -y",
+	data, err := json.MarshalIndent(lmTargets, "  ", "  ")
+	if err != nil {
+		return err
 	}
 
-	return exec.run(execArgs)
+	fmt.Printf("%s\n", data)
+	return nil
 }
